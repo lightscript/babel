@@ -55,6 +55,15 @@ import "./definitions/init";
 import { VISITOR_KEYS, ALIAS_KEYS, NODE_FIELDS, BUILDER_KEYS, DEPRECATED_KEYS } from "./definitions";
 export { VISITOR_KEYS, ALIAS_KEYS, NODE_FIELDS, BUILDER_KEYS, DEPRECATED_KEYS };
 
+export defineType, {
+  assertEach,
+  assertOneOf,
+  assertNodeType,
+  assertNodeOrValueType,
+  assertValueType,
+  chain,
+} from "./definitions";
+
 import * as _react from "./react";
 export { _react as react };
 
@@ -88,9 +97,25 @@ each(t.FLIPPED_ALIAS_KEYS, function (types, type) {
   registerType(type);
 });
 
-export const TYPES = Object.keys(t.VISITOR_KEYS)
-  .concat(Object.keys(t.FLIPPED_ALIAS_KEYS))
-  .concat(Object.keys(t.DEPRECATED_KEYS));
+Object.defineProperty(t, "TYPES", {
+  enumerable: true,
+  configurable: false,
+  get() {
+    this._pushed = this._pushed || [];
+    const _TYPES = Object.keys(t.VISITOR_KEYS)
+      .concat(Object.keys(t.FLIPPED_ALIAS_KEYS))
+      .concat(Object.keys(t.DEPRECATED_KEYS))
+      .concat(this._pushed);
+
+    Object.defineProperty(_TYPES, "push", {
+      enumerable: false,
+      configurable: false,
+      value: (...args) => this._pushed.push(...args)
+    });
+
+    return _TYPES;
+  }
+});
 
 /**
  * Returns whether `node` is of given `type`.
